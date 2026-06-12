@@ -168,61 +168,75 @@ function verifyProof(proof, root, leaf) {
 function main() {
   // The off-chain snapshot: one entry per eligible (coldkey, hotkey) pair, with the
   // alpha balance frozen at the snapshot block and the time-staked multiplier in bps.
+  // Order matters only for proof indexing; the committed root must come from this exact list.
+  const HOTKEY = '5G78yVDm34C7jUM4cAJaAJnE7WhVxVPkxwMhWDt1HF6omcYA';
   const snapshot = [
-    {
-      coldkey: '5EnprsS8GfaHAVKYSkLgtrrjhtdP3xChkkrMrbDxi3o7BMHF',
-      hotkey:  '5CqRMuYSSqYkSa8AM3VawVfdyUhyBufyesvvgh3vCgaGb9Ed',
-      balance: 1_000_000_000n,
-      multiplierBps: 10_000,
-    },
-    {
-      coldkey: '5G78yVDm34C7jUM4cAJaAJnE7WhVxVPkxwMhWDt1HF6omcYA',
-      hotkey:  '5CqRMuYSSqYkSa8AM3VawVfdyUhyBufyesvvgh3vCgaGb9Ed',
-      balance: 1_000_000_000n,
-      multiplierBps: 10_000,
-    },
-    {
-      coldkey: '5FW1Cj4QgRpRL3DA68QxPLvAJNnoePSHsZ3g83S9K6pBAGka',
-      hotkey:  '5CqRMuYSSqYkSa8AM3VawVfdyUhyBufyesvvgh3vCgaGb9Ed',
-      balance: 1_000_000_000n,
-      multiplierBps: 10_000,
-    },
+    { coldkey: '5GHoStNXsJwVXrjUCD4XtkoW6uSfreWZdMcKvvG9kh7ipPBy', hotkey: HOTKEY, balance: 50_000_000_000n, multiplierBps: 10_000 },
+    { coldkey: '5G78yVDm34C7jUM4cAJaAJnE7WhVxVPkxwMhWDt1HF6omcYA', hotkey: HOTKEY, balance: 40_000_000_000n, multiplierBps: 10_000 },
+    { coldkey: '5FW1Cj4QgRpRL3DA68QxPLvAJNnoePSHsZ3g83S9K6pBAGka', hotkey: HOTKEY, balance: 50_000_000_000n, multiplierBps: 10_000 },
+    { coldkey: '5Cm5gawJgfMp6UDcbyjBUu8Xtvg8bbaqqRb5qsVMFrjZn1Yd', hotkey: HOTKEY, balance: 40_000_000_000n, multiplierBps: 10_000 },
+    { coldkey: '5H9YPS9FJX6nbFXkm9zVhoySJBX9RRfWF36abisNz5Ps9YaX', hotkey: HOTKEY, balance: 20_000_000_000n, multiplierBps: 10_000 },
+    { coldkey: '5EnprsS8GfaHAVKYSkLgtrrjhtdP3xChkkrMrbDxi3o7BMHF', hotkey: HOTKEY, balance: 100_000_000_000n, multiplierBps: 10_000 },
   ];
 
   // 1. Build the tree. A council member commits `root` (plus the circulating supply
   //    and snapshot block) via governance.submit_snapshot(root, circulating_supply, block).
   const tree = buildTree(snapshot);
+  console.log('='.repeat(78));
   console.log('Merkle root (submit_snapshot):', u8aToHex(tree.root));
+  console.log('='.repeat(78));
 
-  // 2. A voter generates the proof for their own leaf.
-  const voterIndex = 0;
-  const voter = snapshot[voterIndex];
-  const proof = getProof(tree, voterIndex);
-  const leaf = tree.leaves[voterIndex];
+  // 2. For every leaf, generate its proof and print the exact vote() arguments.
+  //
+  //    IMPORTANT: each vote transaction MUST be signed by that leaf's coldkey — the
+  //    contract recomputes the leaf using env().caller() as the coldkey, so a
+  //    different signer (or a different hotkey/balance/multiplier than what was
+  //    committed in the snapshot) fails with InvalidProof.
+  //
+  //    Proof lengths can differ between leaves: a leaf whose branch was promoted
+  //    at some level (odd node count) has a shorter proof. Supply exactly the
+  //    items printed — no more, no fewer.
+  snapshot.forEach((voter, i) => {
+    const proof = getProof(tree, i);
+    const leaf = tree.leaves[i];
 
-  console.log('\nVoter leaf:', u8aToHex(leaf));
-  console.log('Proof:', proof.map(u8aToHex));
-  console.log('Local verify:', verifyProof(proof, tree.root, leaf)); // must be true
+    if (!verifyProof(proof, tree.root, leaf)) {
+      throw new Error(`leaf ${i} failed verification — tree/proof logic is inconsistent`);
+    }
 
-  // 3. What to supply to governance.vote(...):
-  //    - the transaction MUST be signed by the coldkey (the contract uses env().caller()
-  //      as the coldkey when recomputing the leaf — a mismatched signer fails the proof)
-  console.log('\nvote() arguments:');
-  console.log({
-    proposal_id: 1,
-    hotkey: voter.hotkey,                  // AccountId
-    support: true,                         // bool
-    balance: voter.balance.toString(),     // u128, must equal the snapshot-frozen value
-    multiplier_bps: voter.multiplierBps,   // u32, must equal the snapshot value
-    proof: proof.map(u8aToHex),            // Vec<[u8; 32]>
+    console.log(`\n[leaf ${i}] sign the vote tx with coldkey: ${voter.coldkey}`);
+    console.log(`  leaf hash      : ${u8aToHex(leaf)}`);
+    console.log('  vote() arguments:');
+    console.log(`    proposalId   : <your proposal id>`);
+    console.log(`    hotkey       : ${voter.hotkey}`);
+    console.log(`    support      : true | false`);
+    console.log(`    balance      : ${voter.balance.toString()}`);
+    console.log(`    multiplierBps: ${voter.multiplierBps}`);
+    console.log(`    proof        : ${proof.length} item(s)`);
+    proof.forEach((p, j) => console.log(`      proof[${j}]   : ${u8aToHex(p)}`));
   });
 
-  // Sanity: every leaf must verify against the root.
-  snapshot.forEach((_, i) => {
-    const ok = verifyProof(getProof(tree, i), tree.root, tree.leaves[i]);
-    if (!ok) throw new Error(`leaf ${i} failed verification`);
-  });
-  console.log('\nAll', snapshot.length, 'leaves verify against the root.');
+  console.log(`\nAll ${snapshot.length} leaves verified against the root.`);
+
+  // 3. Machine-readable dump (e.g. for a voting frontend): writes vote-proofs.json
+  //    with the root and per-coldkey vote arguments.
+  const dump = {
+    merkle_root: u8aToHex(tree.root),
+    leaves: snapshot.map((voter, i) => ({
+      coldkey: voter.coldkey, // must be the tx signer
+      vote_args: {
+        hotkey: voter.hotkey,
+        balance: voter.balance.toString(),
+        multiplier_bps: voter.multiplierBps,
+        // NOTE: must be `(p) => u8aToHex(p)`, NOT `.map(u8aToHex)` — map passes the
+        // array index as u8aToHex's second (bitLength) argument, which abbreviates
+        // every element after the first to "0x…XX".
+        proof: getProof(tree, i).map((p) => u8aToHex(p)),
+      },
+    })),
+  };
+  require('fs').writeFileSync('vote-proofs.json', JSON.stringify(dump, null, 2));
+  console.log('Wrote vote-proofs.json');
 }
 
 if (require.main === module) main();

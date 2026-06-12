@@ -1,0 +1,81 @@
+{
+  "merkle_root": "0x1e4e258da6f9f7cc945698b4ed68c20ff24a3f97628ec68ea8ca0492ba5e33e5",
+  "leaves": [
+    {
+      "coldkey": "5GHoStNXsJwVXrjUCD4XtkoW6uSfreWZdMcKvvG9kh7ipPBy",
+      "vote_args": {
+        "hotkey": "5G78yVDm34C7jUM4cAJaAJnE7WhVxVPkxwMhWDt1HF6omcYA",
+        "balance": "50000000000",
+        "multiplier_bps": 10000,
+        "proof": [
+          "0x13f7a78d75d77db61006af5b5f33d41fbcdc1385385c60f184bb0c01346ecca7",
+          "0x9e50df694e24a0da01d383995f9a5d687d3d8b189099fa5ae01f4ea5b6bc3719",
+          "0xf9b34165fca958e361156b9c63e582fdf55283082bc702365a2984d0f442cdbf"
+        ]
+      }
+    },
+    {
+      "coldkey": "5G78yVDm34C7jUM4cAJaAJnE7WhVxVPkxwMhWDt1HF6omcYA",
+      "vote_args": {
+        "hotkey": "5G78yVDm34C7jUM4cAJaAJnE7WhVxVPkxwMhWDt1HF6omcYA",
+        "balance": "40000000000",
+        "multiplier_bps": 10000,
+        "proof": [
+          "0xf90bdf841f7ca93de6c82786024f0b3880de7fb08098f18180c631d6b7089385",
+          "0x9e50df694e24a0da01d383995f9a5d687d3d8b189099fa5ae01f4ea5b6bc3719",
+          "0xf9b34165fca958e361156b9c63e582fdf55283082bc702365a2984d0f442cdbf"
+        ]
+      }
+    },
+    {
+      "coldkey": "5FW1Cj4QgRpRL3DA68QxPLvAJNnoePSHsZ3g83S9K6pBAGka",
+      "vote_args": {
+        "hotkey": "5G78yVDm34C7jUM4cAJaAJnE7WhVxVPkxwMhWDt1HF6omcYA",
+        "balance": "50000000000",
+        "multiplier_bps": 10000,
+        "proof": [
+          "0xcafa2602ce173a06d2d459269c4c1f4e3af4f4881d7d554be734f4e0eb7ccafd",
+          "0x030e528bcce95e91af6c3ffdf7d25aa7da257783edab1c6982e033b45d50b1bf",
+          "0xf9b34165fca958e361156b9c63e582fdf55283082bc702365a2984d0f442cdbf"
+        ]
+      }
+    },
+    {
+      "coldkey": "5Cm5gawJgfMp6UDcbyjBUu8Xtvg8bbaqqRb5qsVMFrjZn1Yd",
+      "vote_args": {
+        "hotkey": "5G78yVDm34C7jUM4cAJaAJnE7WhVxVPkxwMhWDt1HF6omcYA",
+        "balance": "40000000000",
+        "multiplier_bps": 10000,
+        "proof": [
+          "0xea8ad8003aafe70a3ac2e45ef6bb816681c9fbc77c5c3efcb36e66e7b29a10dd",
+          "0x030e528bcce95e91af6c3ffdf7d25aa7da257783edab1c6982e033b45d50b1bf",
+          "0xf9b34165fca958e361156b9c63e582fdf55283082bc702365a2984d0f442cdbf"
+        ]
+      }
+    },
+    {
+      "coldkey": "5H9YPS9FJX6nbFXkm9zVhoySJBX9RRfWF36abisNz5Ps9YaX",
+      "vote_args": {
+        "hotkey": "5G78yVDm34C7jUM4cAJaAJnE7WhVxVPkxwMhWDt1HF6omcYA",
+        "balance": "20000000000",
+        "multiplier_bps": 10000,
+        "proof": [
+          "0x67413f394de9ebbe98963e2c623b14aec9f47dc7c458d961f539b53feb71698f",
+          "0x8087ec264385687cc4d29b28bee03d004b57497eb4a87c241c79ea131d9f2629"
+        ]
+      }
+    },
+    {
+      "coldkey": "5EnprsS8GfaHAVKYSkLgtrrjhtdP3xChkkrMrbDxi3o7BMHF",
+      "vote_args": {
+        "hotkey": "5G78yVDm34C7jUM4cAJaAJnE7WhVxVPkxwMhWDt1HF6omcYA",
+        "balance": "100000000000",
+        "multiplier_bps": 10000,
+        "proof": [
+          "0x56375664355fec2f6dcdcac3c32bf846582421537e75a64db2fef5129521ed70",
+          "0x8087ec264385687cc4d29b28bee03d004b57497eb4a87c241c79ea131d9f2629"
+        ]
+      }
+    }
+  ]
+}
